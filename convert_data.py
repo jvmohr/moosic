@@ -23,13 +23,55 @@ year = sys.argv[2]
 fold = os.path.join("end_month", "end_"+month+'_'+year, "Tracks") # where new data is
 tracks = os.listdir(fold) # get all the file names
 
+# Get previously stored songs
+if not os.path.exists("songs.json"):
+    f = open("songs.json", "w")
+    json.dump({}, f)
+    f.close()
+f = open("songs.json", "r")
+songs = json.load(f)
+f.close()
+
 # read in each track
 total = []
+track_num = {}
 for track in tracks:
     place_holder = pd.read_csv(open(os.path.join(fold, track), 'r', encoding='utf-8'))
+    title = place_holder['Title'][0]
+    curr_song = str(place_holder['Title'][0]) + str(place_holder['Album'][0]) + str(place_holder['Artist'][0]) + str(place_holder['Duration (ms)'][0])
+    curr_song = curr_song.upper() # to get rid of inconsistencies w/ data from Google
+    curr_song = html.unescape(curr_song)
+    
+    if title in track_num:
+        track_num[title] += 1
+    else:
+        track_num[title] = 1
+    
+    if curr_song in songs.keys():
+        place_holder["Title"] = songs[curr_song]
+    else:
+        # find a name
+        if str(place_holder['Title'][0]) in songs.values():
+            i = 1
+            while True:
+                working_title = str(place_holder['Title'][0]) + "(" + str(i) + ")"
+                if working_title in songs.values():
+                    i += 1
+                    continue
+                songs[curr_song] = working_title
+                place_holder['Title'] = working_title
+                break
+        else:
+            songs[curr_song] = str(place_holder['Title'][0])
+    
     total.append(place_holder)
     
 end_of_year_df = pd.concat(total)
+
+# save all songs 
+f = open("songs.json", "w")
+json.dump(songs, f)
+f.close()
 
 # Drop columns & escape html
 working_df = end_of_year_df.drop(['Rating', 'Removed'], axis=1)
