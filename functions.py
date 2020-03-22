@@ -7,8 +7,8 @@ Created on Fri Jan 17 14:49:39 2020
 
 # Imports - hi
 import pandas as pd
-import os
-import json
+import os, json
+from calendar import monthrange
 
 global current
 months = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 
@@ -170,8 +170,14 @@ def month_statistics(month, compress=True, top=True, top_songs=0, top_albums=0,
             print("  ", song)
     
     # Overall statistics
-    print("   Play Count:", diff.sum()['Play Count'])
-    print("   Time in hours:", "{0:.2f}".format(diff.sum()['Total Duration']))
+    print("    Play Count:", diff.sum()['Play Count'])
+    print("    Time: {0:.2f} hours".format(diff.sum()['Total Duration']))
+    
+    # Avg per day
+    _, num_days = monthrange(int(month[4:]), months.index(month[:3]))
+    print("Per Day ({}):".format(num_days))
+    print("    Play Count: {0:.2f}".format(diff.sum()['Play Count'] / num_days))
+    print("    Time: {0:.2f} hours".format(diff.sum()['Total Duration'] / num_days))
     
     # Songs that broke milestones (100, 200, etc.)
     max_plays = new_data['Play Count'].max()
@@ -223,9 +229,9 @@ def _top_n(data, n, key='Play Count'):
     data.sort_values(by=key, ascending=False, inplace=True)
     for i in range(n):
         if key == 'Play Count':
-            print("   ", int(data.iloc[i][key]), "plays:", data.index[i])
+            print("    {} plays: {}".format(int(data.iloc[i][key]), data.index[i]))
         elif key == 'Total Duration':
-            print("   ", "{0:.2f}".format(data.iloc[i][key]), "hours:", data.index[i])
+            print("    {0:.2f} hours: {}".format(data.iloc[i][key], data.index[i]))
     return
 
 def overall_statistics():
@@ -234,9 +240,7 @@ def overall_statistics():
     
     # Overall statistics
     print(data.sum()['Play Count'], 'plays')
-    print("{0:.2f}".format(data.sum()['Total Duration']), 'hours')
-    
-    
+    print("{0:.2f} hours".format(data.sum()['Total Duration']))
     
     return
 
