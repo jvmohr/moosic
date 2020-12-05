@@ -21,7 +21,12 @@ if len(sys.argv) != 3:
 month = sys.argv[1]
 year = sys.argv[2]
 fold = os.path.join("end_month", "end_"+month+'_'+year, "Tracks") # where new data is
-tracks = os.listdir(fold) # get all the file names
+all_files = os.listdir(fold) # get all the file names
+
+tracks = []
+for song in all_files:
+    if '.csv' in song:
+        tracks.append(song)
 
 # Get previously stored songs
 if not os.path.exists("songs.json"):
@@ -36,7 +41,7 @@ f.close()
 total = []
 track_num = {}
 for track in tracks:
-    place_holder = pd.read_csv(open(os.path.join(fold, track), 'r', encoding='utf-8'))
+    place_holder = pd.read_csv(open(os.path.join(fold, track), 'r', encoding='utf-8'), dtype={'Title':str})
     title = place_holder['Title'][0]
     curr_song = str(place_holder['Title'][0]) + str(place_holder['Album'][0]) + str(place_holder['Artist'][0]) + str(place_holder['Duration (ms)'][0])
     curr_song = curr_song.upper() # to get rid of inconsistencies w/ data from Google
@@ -46,7 +51,7 @@ for track in tracks:
         track_num[title] += 1
     else:
         track_num[title] = 1
-    
+        
     if curr_song in songs.keys():
         place_holder["Title"] = songs[curr_song]
     else:

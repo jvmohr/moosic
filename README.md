@@ -1,6 +1,12 @@
 # moosic
 
-Very much in-progress.
+Very much in-progress. (Update: Not anymore.)
+
+## Update
+
+Likely won't be updated any longer as Google Play Music has been canned by Google. 
+
+## Overview
 
 Uses data user has to get from https://takeout.google.com/?hl=en to compute statistics. 
 
@@ -11,3 +17,4 @@ Note: Data for December is also saved as end of the year data.
 Note: The data is thought of as being from the end of a month. 
 
 moosic.py will be the driver for functions.py. 
+
